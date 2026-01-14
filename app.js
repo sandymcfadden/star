@@ -535,15 +535,23 @@ async function deleteCategory(id) {
 async function updateCategoryDropdowns() {
     // Update task form category dropdown
     const taskCategory = document.getElementById('taskCategory');
-    taskCategory.innerHTML = categories.map(cat =>
-        `<option value="${cat.name}">${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>`
-    ).join('');
+    if (categories.length === 0) {
+        taskCategory.innerHTML = '<option value="">No categories - create one first</option>';
+    } else {
+        taskCategory.innerHTML = categories.map(cat =>
+            `<option value="${cat.name}">${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>`
+        ).join('');
+    }
 
     // Update bulk import category dropdown
     const bulkCategory = document.getElementById('bulkCategory');
-    bulkCategory.innerHTML = categories.map(cat =>
-        `<option value="${cat.name}">${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>`
-    ).join('');
+    if (categories.length === 0) {
+        bulkCategory.innerHTML = '<option value="">No categories - create one first</option>';
+    } else {
+        bulkCategory.innerHTML = categories.map(cat =>
+            `<option value="${cat.name}">${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</option>`
+        ).join('');
+    }
 }
 
 function getCategoryColor(categoryName) {
@@ -707,10 +715,19 @@ async function renderTasks() {
     }
 
     if (tasks.length === 0) {
+        let message;
+        if (searchQuery) {
+            message = 'Try a different search term';
+        } else if (categories.length === 0) {
+            message = 'Click "Settings" → "Manage Categories" to create your first category, then add tasks';
+        } else {
+            message = 'Click "Add New Task" to create your first task';
+        }
+
         taskList.innerHTML = `
             <div class="empty-state">
                 <h3>No tasks found</h3>
-                <p>${searchQuery ? 'Try a different search term' : 'Click "Add New Task" to create your first task'}</p>
+                <p>${message}</p>
             </div>
         `;
         return;

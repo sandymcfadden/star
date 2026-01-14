@@ -28,10 +28,6 @@ class TaskDatabase {
                         autoIncrement: true
                     });
                     categoriesStore.createIndex('name', 'name', { unique: true });
-
-                    // Add default categories
-                    categoriesStore.add({ name: 'software', color: '#1976d2' });
-                    categoriesStore.add({ name: 'support', color: '#7b1fa2' });
                 }
             }
         });
