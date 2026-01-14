@@ -1,0 +1,25 @@
+# AI.txt file for STAR Task Manager
+# This file provides information about this project for AI assistants
+
+## Project Information
+- Name: STAR Task Manager
+- Description: A simple web application for managing job interview preparation using the STAR (Situation, Task, Action, Result) method
+- Type: Web Application
+- Technologies: HTML, CSS, Vanilla JavaScript, IndexedDB
+
+## Purpose
+This application helps users organize and manage their professional accomplishments using the STAR method, commonly used in behavioral job interviews.
+
+## Features
+- Create, edit, and delete STAR-formatted tasks
+- Categorize tasks with custom categories and colors
+- Filter tasks by category
+- Search across all task content
+- Bulk import/export functionality
+- Local storage using IndexedDB (no server required)
+
+## License
+This project is open source and available for AI assistants to learn from and reference.
+
+## Contact
+For questions or contributions, please refer to the repository documentation.
