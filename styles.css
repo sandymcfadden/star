@@ -695,6 +695,70 @@ h1 {
     line-height: 1.4;
 }
 
+/* Footer */
+.app-footer {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.app-footer p {
+    margin: 0;
+}
+
+.app-footer strong {
+    color: var(--text-primary);
+}
+
+@media (min-width: 600px) {
+    .app-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.github-link:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.github-link:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.github-link svg {
+    transition: transform 0.2s ease;
+}
+
+.github-link:hover svg {
+    transform: scale(1.1);
+}
+
 /* Theme Toggle Button */
 .theme-toggle {
     background: var(--bg-elevated);
