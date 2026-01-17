@@ -5,6 +5,7 @@ let searchQuery = '';
 let categories = [];
 let lastFocusedElement = null;
 let focusTrapCleanup = null;
+let formDirty = false;
 
 // DOM elements
 const mainContainer = document.getElementById('mainContainer');
@@ -303,6 +304,7 @@ function ensureInertState() {
 async function openModal(task = null) {
     lastFocusedElement = document.activeElement;
     currentEditingTaskId = task ? task.id : null;
+    formDirty = false; // Reset dirty flag
 
     await updateCategoryDropdowns();
 
@@ -322,14 +324,32 @@ async function openModal(task = null) {
     taskModal.classList.add('active');
     document.body.style.overflow = 'hidden';
     trapFocus(taskModal.querySelector('.modal-content'));
+
+    // Set up form change detection
+    setTimeout(() => {
+        const formInputs = taskForm.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                formDirty = true;
+            }, { once: false });
+        });
+    }, 100);
 }
 
-function closeModal() {
+function closeModal(force = false) {
+    // Check if form has unsaved changes
+    if (!force && formDirty) {
+        if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+            return;
+        }
+    }
+
     if (focusTrapCleanup) focusTrapCleanup();
     mainContainer.inert = false; // Always ensure inert is removed
     taskModal.classList.remove('active');
     taskForm.reset();
     currentEditingTaskId = null;
+    formDirty = false;
     document.body.style.overflow = '';
     if (lastFocusedElement) lastFocusedElement.focus();
 }
@@ -337,6 +357,7 @@ function closeModal() {
 // Bulk modal functions
 async function openBulkModal() {
     lastFocusedElement = document.activeElement;
+    formDirty = false; // Reset dirty flag
     await updateCategoryDropdowns();
     // Set to first category if available
     if (categories.length > 0) {
@@ -345,13 +366,31 @@ async function openBulkModal() {
     bulkModal.classList.add('active');
     document.body.style.overflow = 'hidden';
     trapFocus(bulkModal.querySelector('.modal-content'));
+
+    // Set up form change detection
+    setTimeout(() => {
+        const formInputs = bulkForm.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                formDirty = true;
+            }, { once: false });
+        });
+    }, 100);
 }
 
-function closeBulkModal() {
+function closeBulkModal(force = false) {
+    // Check if form has unsaved changes
+    if (!force && formDirty) {
+        if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+            return;
+        }
+    }
+
     if (focusTrapCleanup) focusTrapCleanup();
     mainContainer.inert = false; // Always ensure inert is removed
     bulkModal.classList.remove('active');
     bulkForm.reset();
+    formDirty = false;
     document.body.style.overflow = '';
     if (lastFocusedElement) lastFocusedElement.focus();
 }
@@ -664,7 +703,7 @@ async function handleBulkSubmit(e) {
         await taskDB.addTask(task);
     }
 
-    closeBulkModal();
+    closeBulkModal(true); // Force close without confirmation after successful import
     await renderTasks();
 
     announce(`Successfully imported ${tasks.length} task${tasks.length !== 1 ? 's' : ''}`);
@@ -693,7 +732,7 @@ async function handleTaskSubmit(e) {
         announce(`Task "${taskData.title}" added`);
     }
 
-    closeModal();
+    closeModal(true); // Force close without confirmation after save
     await renderTasks();
 }
 
