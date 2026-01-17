@@ -250,6 +250,22 @@ Title of second task
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmModalTitle" aria-describedby="confirmModalMessage" aria-modal="true">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2 id="confirmModalTitle">Confirm Action</h2>
+            </div>
+            <div class="confirm-message">
+                <p id="confirmModalMessage"></p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Import idb library (local copy for offline use) -->
     <script src="idb.js"></script>
     <script src="db.js"></script>

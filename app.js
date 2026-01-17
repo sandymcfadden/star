@@ -41,6 +41,10 @@ const closeBulkBtn = document.querySelector('.close-bulk');
 const closeExportX = document.querySelector('.close-export');
 const closeCategoryX = document.querySelector('.close-category');
 const announcements = document.getElementById('announcements');
+const confirmModal = document.getElementById('confirmModal');
+const confirmModalMessage = document.getElementById('confirmModalMessage');
+const confirmOkBtn = document.getElementById('confirmOkBtn');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
 
 // Theme management
 function initTheme() {
@@ -336,10 +340,11 @@ async function openModal(task = null) {
     }, 100);
 }
 
-function closeModal(force = false) {
+async function closeModal(force = false) {
     // Check if form has unsaved changes
     if (!force && formDirty) {
-        if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+        const confirmed = await showConfirm('You have unsaved changes. Are you sure you want to close?');
+        if (!confirmed) {
             return;
         }
     }
@@ -378,10 +383,11 @@ async function openBulkModal() {
     }, 100);
 }
 
-function closeBulkModal(force = false) {
+async function closeBulkModal(force = false) {
     // Check if form has unsaved changes
     if (!force && formDirty) {
-        if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+        const confirmed = await showConfirm('You have unsaved changes. Are you sure you want to close?');
+        if (!confirmed) {
             return;
         }
     }
@@ -418,6 +424,56 @@ function closeExportModal() {
     exportModal.classList.remove('active');
     document.body.style.overflow = '';
     if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+// Confirmation modal functions
+function showConfirm(message) {
+    return new Promise((resolve) => {
+        lastFocusedElement = document.activeElement;
+        confirmModalMessage.textContent = message;
+        confirmModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        mainContainer.inert = true;
+
+        // Focus the cancel button by default (safer choice)
+        confirmCancelBtn.focus();
+
+        // Set up one-time event handlers
+        const handleOk = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        const handleCancel = () => {
+            cleanup();
+            resolve(false);
+        };
+
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                cleanup();
+                resolve(false);
+            }
+        };
+
+        const cleanup = () => {
+            confirmOkBtn.removeEventListener('click', handleOk);
+            confirmCancelBtn.removeEventListener('click', handleCancel);
+            document.removeEventListener('keydown', handleEscape);
+            if (focusTrapCleanup) focusTrapCleanup();
+            mainContainer.inert = false;
+            confirmModal.classList.remove('active');
+            document.body.style.overflow = '';
+            if (lastFocusedElement) lastFocusedElement.focus();
+        };
+
+        confirmOkBtn.addEventListener('click', handleOk);
+        confirmCancelBtn.addEventListener('click', handleCancel);
+        document.addEventListener('keydown', handleEscape);
+
+        // Set up focus trap
+        trapFocus(confirmModal.querySelector('.modal-content'));
+    });
 }
 
 // Generate export text from tasks
@@ -561,7 +617,8 @@ async function deleteCategory(id) {
         return;
     }
 
-    if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+    const confirmed = await showConfirm(`Are you sure you want to delete the category "${category.name}"?`);
+    if (confirmed) {
         await taskDB.deleteCategory(id);
         await loadCategories();
         renderFilterButtons();
@@ -883,7 +940,8 @@ async function handleDeleteTask(e) {
     const taskId = parseInt(e.target.dataset.taskId);
     const task = await taskDB.getTask(taskId);
 
-    if (confirm('Are you sure you want to delete this task?')) {
+    const confirmed = await showConfirm('Are you sure you want to delete this task?');
+    if (confirmed) {
         await taskDB.deleteTask(taskId);
         await renderTasks();
         announce(`Task "${task.title}" deleted`);
